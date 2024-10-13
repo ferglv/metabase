@@ -19,7 +19,7 @@ Start by cloning this repository to your local machine:
 
 Use Docker Compose to build and run the Metabase and NGINX containers:
 
-`docker-compose up -d`
+`docker-compose up --build -d`
 
 This command will download the necessary Docker images, build the containers, and start them in detached mode.
 
@@ -27,19 +27,16 @@ This command will download the necessary Docker images, build the containers, an
 
 Once the containers are running, access Metabase through your web browser:
 
-`http://localhost`
+`http://localhost:3000`
 
 ## Configuration
-### NGINX
-- The NGINX configuration file (nginx.conf) is set up to reverse proxy to Metabase. You can modify this file to customize the NGINX behavior.
 
 ### Metabase
-- Metabase data is persisted in a volume mapped to the ./metabase-data directory in your local machine.
+- Metabase data is persisted in a volume mapped to the ./app-db-data directory in your local machine for local development.
 - For initial setup and configuration of Metabase, follow the on-screen instructions when accessing Metabase for the first time.
 
 ### Troubleshooting
 - If you encounter any issues, check the Docker container logs for more information.
-- For NGINX issues, verify the syntax of your configuration file with sudo nginx -t and inspect the logs in /var/log/nginx/.
 - Ensure that Docker services are properly configured and running.
 
 ## Contributing
