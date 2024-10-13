@@ -1,7 +1,7 @@
 # docker-compose.yml
 services:
   metabase:
-    image: metabase/metabase:latest
+    image: metabase/metabase:v0.50.29
     container_name: metabase
     restart: always
     ports:
@@ -15,22 +15,23 @@ services:
       - MB_DB_USER=${MB_DB_USER?Variable not set}
       - MB_DB_PASS=${MB_DB_PASS?Variable not set}
       - MB_ENCRYPTION_SECRET_KEY=${MB_ENCRYPTION_SECRET_KEY?Variable not set}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.${STACK_NAME?Variable not set}-streamlit-http.rule=Host(`metabase.${DOMAIN?Variable not set}`)
+      - traefik.http.routers.${STACK_NAME?Variable not set}-streamlit-http.entrypoints=http
+      - traefik.http.routers.${STACK_NAME?Variable not set}-streamlit-http.middlewares=https-redirect
+      - traefik.http.routers.${STACK_NAME?Variable not set}-streamlit-https.rule=Host(`metabase.${DOMAIN?Variable not set}`)
+      - traefik.http.routers.${STACK_NAME?Variable not set}-streamlit-https.entrypoints=https
+      - traefik.http.routers.${STACK_NAME?Variable not set}-streamlit-https.tls=true
+      - traefik.http.routers.${STACK_NAME?Variable not set}-streamlit-https.tls.certresolver=le
+      - traefik.http.services.${STACK_NAME?Variable not set}-streamlit.loadbalancer.server.port=3000
+    networks:
+      - traefik-public
+      - default
 
-  metabase_db:
-    image: postgres:12
-    container_name: metabase_db
-    restart: always
-    volumes:
-      - ./app-db-data:/var/lib/postgresql/data/pgdata
-    env_file:
-      - .env
-    environment:
-      - PGDATA=/var/lib/postgresql/data/pgdata
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
-    ports:
-      - "5432:5432"
-
-volumes:
-  app-db-data:
+networks:
+  traefik-public:
+    # Allow setting it to false for testing
+    external: true
